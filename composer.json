@@ -1,0 +1,21 @@
+{
+    "name": "mitch/satisfy",
+    "description": "OAuth 2 package for PHP",
+    "authors": [
+        {
+            "name": "Mitchell van Wijngaarden",
+            "email": "hey@mitchellvanwijngaarden.nl"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/support": "4.1.*",
+        "guzzle/guzzle": "3.8.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Mitch\\Satisfy": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}
