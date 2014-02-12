@@ -17,9 +17,7 @@ class Guzzle
         $query['path'] = $path;
         $request = $this->client->{$verb}([$pattern, $query]);
         $response = $request->send();
-        // d($response->json());
-        d($response->getBody(true));
-        dd($response->getBody());
+        return $response->getBody(true);
     }
 
     public function setDefaultOption($name, $option)

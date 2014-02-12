@@ -1,7 +1,14 @@
 <?php namespace Mitch\Satisfy\Drivers;
 
+use Mitch\Satisfy\AccessTokenResponse;
+
 class GithubDriver extends Driver
 {
+    public function getDriverName()
+    {
+        return 'Github';
+    }
+
     protected function getAuthorizationBase()
     {
         return 'https://github.com/login/oauth/authorize';
@@ -27,8 +34,10 @@ class GithubDriver extends Driver
         $this->setHeaders(['Accept' => 'application/vnd.github.v3+json']);
     }
 
-    public function getDriverName()
+    protected function processAccessTokenResponse($json)
     {
-        return 'Github';
+        $items = json_decode($json);
+        $scopes = explode(',', $items->scope);
+        return new AccessTokenResponse($items->access_token, $items->token_type, $scopes);
     }
 }

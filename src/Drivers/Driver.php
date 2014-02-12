@@ -20,12 +20,13 @@ abstract class Driver
         $this->headers = $headers;
     }
 
+    abstract public function getDriverName();
     abstract protected function getAuthorizationBase();
     abstract protected function getAccessTokenBase();
     abstract protected function getApiBase();
     abstract protected function setDefaultAuthorizationHeaders();
     abstract protected function setDefaultApiHeaders();
-    abstract protected function getDriverName();
+    abstract protected function processAccessTokenResponse($json);
 
     public function authorize()
     {
@@ -48,7 +49,7 @@ abstract class Driver
     {
         $query = $this->prepareAuthorizationRequest(['code' => $code]);
         $response = $this->client->request($this->getAccessTokenBase(), $query, 'post');
-        dd($response);
+        return $this->processAccessTokenResponse($response);
     }
 
     public function setClient(Client $client)

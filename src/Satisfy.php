@@ -6,6 +6,7 @@ class Satisfy
 {
     private $driver;
     private $lastResponse;
+    private $requestedScopes = [];
 
     public function __construct(Driver $driver = null)
     {
@@ -20,29 +21,26 @@ class Satisfy
 
     public function authorize()
     {
+        $this->setRequestedScopes();
         $this->driver->authorize();
     }
 
     public function getAuthorizationUrl()
     {
+        $this->setRequestedScopes();
         return $this->driver->getAuthorizationUrl();
     }
 
     public function getAccessToken($code)
     {
-        return $this->driver->requestAccessToken($code);
+        $this->lastResponse = $this->driver->requestAccessToken($code);
+        return $this->lastResponse;
     }
 
-    public function setHeaders($headers = [])
+    public function hasRequestedScopes(AccessTokenResponse $response = null)
     {
-        foreach ((array) $headers as $name => $content) {
-            $this->driver->setHeader($name, $content);
-        }
-    }
-
-    public function hasRequestedScopes()
-    {
-        // check if we have all the requested scopes
+        $response = $response ?: $this->lastResponse;
+        return $this->areScopesEqual($response->getScopes());
     }
 
     public function getAcceptedScopes()
@@ -64,6 +62,36 @@ class Satisfy
         return $this->hasAcceptedScopes((array) $scope);
     }
 
+    public function setHeader($header, $value)
+    {
+        $this->driver->setHeader($header, $value);
+    }
+
+    public function setHeaders($headers = [])
+    {
+        $this->driver->setHeaders($headers);
+    }
+
+    public function getHeaders()
+    {
+        return $this->driver->getHeaders();
+    }
+
+    public function setScope($scope)
+    {
+        $this->driver->setScope($scope);
+    }
+
+    public function setScopes($scopes = [])
+    {
+        $this->driver->setScopes($scopes);
+    }
+
+    public function getScopes()
+    {
+        return $this->driver->getScopes();
+    }
+
     public function getQueryBuilder()
     {
         //
@@ -82,5 +110,18 @@ class Satisfy
     public function getLastResponse()
     {
         return $this->lastResponse;
+    }
+
+    private function setRequestedScopes()
+    {
+        $this->requestedScopes = $this->getScopes();
+    }
+
+    private function areScopesEqual($scopes)
+    {
+        if ( ! $scopes) {
+            throw new AccessTokenResponseNotFoundException;
+        }
+        return $this->requestedScopes == $scopes;
     }
 }

@@ -13,8 +13,8 @@
         "guzzle/guzzle": "3.8.*"
     },
     "autoload": {
-        "psr-0": {
-            "Mitch\\Satisfy": "src/"
+        "psr-4": {
+            "Mitch\\Satisfy\\": "src/"
         }
     },
     "minimum-stability": "stable"
