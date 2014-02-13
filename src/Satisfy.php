@@ -5,8 +5,7 @@ use Mitch\Satisfy\Drivers\Driver;
 class Satisfy
 {
     private $driver;
-    private $lastResponse;
-    private $requestedScopes = [];
+    private $token;
 
     public function __construct(Driver $driver = null)
     {
@@ -21,45 +20,38 @@ class Satisfy
 
     public function authorize()
     {
-        $this->setRequestedScopes();
         $this->driver->authorize();
     }
 
     public function getAuthorizationUrl()
     {
-        $this->setRequestedScopes();
         return $this->driver->getAuthorizationUrl();
     }
 
     public function getAccessToken($code)
     {
-        $this->lastResponse = $this->driver->requestAccessToken($code);
-        return $this->lastResponse;
-    }
-
-    public function hasRequestedScopes(AccessTokenResponse $response = null)
-    {
-        $response = $response ?: $this->lastResponse;
-        return $this->areScopesEqual($response->getScopes());
+        $this->token = $this->driver->requestAccessToken($code);
+        return $this->token;
     }
 
     public function getAcceptedScopes()
     {
-        return $this->driver->getAcceptedScopes();
+        return $this->token->getAcceptedScopes();
     }
 
-    public function hasAcceptedScopes($scopes = [])
+    public function hasScopes($scopes = [])
     {
-        $accepted = $this->getAcceptedScopes();
-        foreach ($scopes as $scope) {
-            if( ! in_array($scope, $accepted)) return false;
-        }
-        return true;
+        return $this->token->hasScopes($scopes);
     }
 
-    public function hasAcceptedScope($scope)
+    public function hasScope($scope)
     {
-        return $this->hasAcceptedScopes((array) $scope);
+        return $this->token->hasScopes((array) $scope);
+    }
+
+    public function getQueryBuilder()
+    {
+        //
     }
 
     public function setHeader($header, $value)
@@ -92,36 +84,18 @@ class Satisfy
         return $this->driver->getScopes();
     }
 
-    public function getQueryBuilder()
+    public function setLastToken($token)
     {
-        //
+        $this->token = $token;
     }
 
-    public function getCurrentDriverName()
+    public function getLastToken()
+    {
+        return $this->token;
+    }
+
+    public function getDriverName()
     {
         return $this->driver->getDriverName();
-    }
-
-    public function setLastResponse($response)
-    {
-        $this->lastResponse = $response;
-    }
-
-    public function getLastResponse()
-    {
-        return $this->lastResponse;
-    }
-
-    private function setRequestedScopes()
-    {
-        $this->requestedScopes = $this->getScopes();
-    }
-
-    private function areScopesEqual($scopes)
-    {
-        if ( ! $scopes) {
-            throw new AccessTokenResponseNotFoundException;
-        }
-        return $this->requestedScopes == $scopes;
     }
 }

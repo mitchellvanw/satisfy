@@ -1,6 +1,6 @@
 <?php namespace Mitch\Satisfy\Drivers;
 
-use Mitch\Satisfy\AccessTokenResponse;
+use Mitch\Satisfy\AccessToken;
 
 class GithubDriver extends Driver
 {
@@ -24,20 +24,20 @@ class GithubDriver extends Driver
         return 'https://api.github.com';
     }
 
-    protected function setDefaultAuthorizationHeaders()
+    protected function getDefaultAuthorizationHeaders()
     {
-        $this->setHeaders(['Accept' => 'application/json']);
+        return ['Accept' => 'application/json'];
     }
 
-    protected function setDefaultApiHeaders()
+    protected function getDefaultApiHeaders()
     {
-        $this->setHeaders(['Accept' => 'application/vnd.github.v3+json']);
+        return ['Accept' => 'application/vnd.github.v3+json'];
     }
 
     protected function processAccessTokenResponse($json)
     {
         $items = json_decode($json);
         $scopes = explode(',', $items->scope);
-        return new AccessTokenResponse($items->access_token, $items->token_type, $scopes);
+        return new AccessToken($items->access_token, $items->token_type, $scopes, $this->getScopes());
     }
 }

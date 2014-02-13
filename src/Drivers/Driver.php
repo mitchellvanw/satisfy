@@ -24,8 +24,8 @@ abstract class Driver
     abstract protected function getAuthorizationBase();
     abstract protected function getAccessTokenBase();
     abstract protected function getApiBase();
-    abstract protected function setDefaultAuthorizationHeaders();
-    abstract protected function setDefaultApiHeaders();
+    abstract protected function getDefaultAuthorizationHeaders();
+    abstract protected function getDefaultApiHeaders();
     abstract protected function processAccessTokenResponse($json);
 
     public function authorize()
@@ -64,7 +64,7 @@ abstract class Driver
 
     public function setScopes($scopes = [])
     {
-        $this->scopes = $scopes;
+        $this->scopes = array_merge($scopes, $this->scopes);
     }
 
     public function getScopes()
@@ -106,7 +106,7 @@ abstract class Driver
 
     private function prepareAuthorizationRequest($extra = [])
     {
-        $this->setDefaultAuthorizationHeaders();
+        $this->setHeaders($this->getDefaultAuthorizationHeaders());
         $this->setDefaultClientOptions();
         $query = [
             'client_id' => $this->config['client_id'],
